@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlickBite - Movie Night Meal Planner</title>
+    <meta name="description" content="FlickBite helps users plan the perfect movie night by pairing movies with delicious meals using TMDB and TheMealDB APIs.">
+    <meta name="author" content="Okolocha Deborah">
+    <link rel="stylesheet" href="styles/flickbite.css">
+    <script type="module" src="js/main.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">🎬🍴 FlickBite</div>
+            <nav>
+                <button id="homeBtn" class="nav-btn active">Home</button>
+                <button id="favoritesBtn" class="nav-btn">My Pairings</button>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Home View -->
+        <section id="homeView" class="view active">
+            <div class="hero">
+                <h1>Find Your Perfect Movie Night</h1>
+                <p>Pair movies with delicious meals for the ultimate entertainment experience</p>
+                
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="Search for a movie..." />
+                    <button id="searchBtn">🔍 Search</button>
+                </div>
+
+                <button id="surpriseBtn" class="surprise-btn">🎲 Surprise Me!</button>
+            </div>
+
+            <div class="container">
+                <h2>Browse by Genre</h2>
+                <div class="genre-grid" id="genreGrid">
+                    <!-- Genres will be loaded here -->
+                </div>
+
+                <h2>Trending Movies</h2>
+                <div class="movie-grid" id="movieGrid">
+                    <!-- Movies will be loaded here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Movie & Meal Pairing View -->
+        <section id="pairingView" class="view">
+            <div class="container">
+                <button id="backBtn" class="back-btn">← Back</button>
+                <div id="pairingDetail">
+                    <!-- Movie and meal pairing will be loaded here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Favorites View -->
+        <section id="favoritesView" class="view">
+            <div class="container">
+                <h1>My Saved Pairings</h1>
+                <div class="pairings-grid" id="pairingsGrid">
+                    <!-- Saved pairings will be loaded here -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 FlickBite | Powered by TMDB & TheMealDB APIs</p>
+        </div>
+    </footer>
+</body>
+</html>
