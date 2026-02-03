@@ -19,7 +19,15 @@ class FlickBite {
     init() {
         this.setupEventListeners();
         this.loadGenres();
-        this.loadTrendingMovies();
+        
+        // Check which grid exists on the page
+        if (document.getElementById('movieGrid')) {
+            // Original single grid version
+            this.loadTrendingMovies();
+        } else {
+            // Multiple sections version
+            this.loadAllSections();
+        }
     }
 
     setupEventListeners() {
@@ -74,14 +82,126 @@ class FlickBite {
         grid.innerHTML = genreCards;
     }
 
-    async loadTrendingMovies() {
-        const grid = document.getElementById('movieGrid');
+    // Load all sections (for multiple grids version)
+    async loadAllSections() {
+        this.loadTrendingSection();
+        this.loadPopularSection();
+        this.loadTopRatedSection();
+        this.loadActionSection();
+        this.loadComedySection();
+    }
+
+    // Trending Section
+    async loadTrendingSection() {
+        const grid = document.getElementById('trendingGrid');
+        if (!grid) return;
+        
         grid.innerHTML = '<div class="loading">Loading trending movies...</div>';
 
         try {
             const movies = await this.tmdbAPI.getTrendingMovies();
             if (movies && movies.length > 0) {
-                this.ui.renderMovieGrid(movies.slice(0, 8), grid, (movie) => this.showMoviePairing(movie.id));
+                this.ui.renderMovieGrid(movies.slice(0, 40), grid, (movie) => this.showMoviePairing(movie.id));
+            } else {
+                grid.innerHTML = '<div class="empty-state"><h2>No movies found</h2></div>';
+            }
+        } catch (error) {
+            console.error('Error loading trending movies:', error);
+            grid.innerHTML = '<div class="empty-state"><h2>Error loading movies</h2></div>';
+        }
+    }
+
+    // Popular Section
+    async loadPopularSection() {
+        const grid = document.getElementById('popularGrid');
+        if (!grid) return;
+        
+        grid.innerHTML = '<div class="loading">Loading popular movies...</div>';
+
+        try {
+            const movies = await this.tmdbAPI.getPopularMovies();
+            if (movies && movies.length > 0) {
+                this.ui.renderMovieGrid(movies.slice(0, 40), grid, (movie) => this.showMoviePairing(movie.id));
+            } else {
+                grid.innerHTML = '<div class="empty-state"><h2>No movies found</h2></div>';
+            }
+        } catch (error) {
+            console.error('Error loading popular movies:', error);
+            grid.innerHTML = '<div class="empty-state"><h2>Error loading movies</h2></div>';
+        }
+    }
+
+    // Top Rated Section
+    async loadTopRatedSection() {
+        const grid = document.getElementById('topRatedGrid');
+        if (!grid) return;
+        
+        grid.innerHTML = '<div class="loading">Loading top rated movies...</div>';
+
+        try {
+            const movies = await this.tmdbAPI.getTopRatedMovies();
+            if (movies && movies.length > 0) {
+                this.ui.renderMovieGrid(movies.slice(0, 40), grid, (movie) => this.showMoviePairing(movie.id));
+            } else {
+                grid.innerHTML = '<div class="empty-state"><h2>No movies found</h2></div>';
+            }
+        } catch (error) {
+            console.error('Error loading top rated movies:', error);
+            grid.innerHTML = '<div class="empty-state"><h2>Error loading movies</h2></div>';
+        }
+    }
+
+    // Action Section
+    async loadActionSection() {
+        const grid = document.getElementById('actionGrid');
+        if (!grid) return;
+        
+        grid.innerHTML = '<div class="loading">Loading action movies...</div>';
+
+        try {
+            const movies = await this.tmdbAPI.getMoviesByGenre(28);
+            if (movies && movies.length > 0) {
+                this.ui.renderMovieGrid(movies.slice(0, 40), grid, (movie) => this.showMoviePairing(movie.id));
+            } else {
+                grid.innerHTML = '<div class="empty-state"><h2>No movies found</h2></div>';
+            }
+        } catch (error) {
+            console.error('Error loading action movies:', error);
+            grid.innerHTML = '<div class="empty-state"><h2>Error loading movies</h2></div>';
+        }
+    }
+
+    // Comedy Section
+    async loadComedySection() {
+        const grid = document.getElementById('comedyGrid');
+        if (!grid) return;
+        
+        grid.innerHTML = '<div class="loading">Loading comedy movies...</div>';
+
+        try {
+            const movies = await this.tmdbAPI.getMoviesByGenre(35);
+            if (movies && movies.length > 0) {
+                this.ui.renderMovieGrid(movies.slice(0, 40), grid, (movie) => this.showMoviePairing(movie.id));
+            } else {
+                grid.innerHTML = '<div class="empty-state"><h2>No movies found</h2></div>';
+            }
+        } catch (error) {
+            console.error('Error loading comedy movies:', error);
+            grid.innerHTML = '<div class="empty-state"><h2>Error loading movies</h2></div>';
+        }
+    }
+
+    // Original single grid version (for backward compatibility)
+    async loadTrendingMovies() {
+        const grid = document.getElementById('movieGrid');
+        if (!grid) return;
+        
+        grid.innerHTML = '<div class="loading">Loading trending movies...</div>';
+
+        try {
+            const movies = await this.tmdbAPI.getTrendingMovies();
+            if (movies && movies.length > 0) {
+                this.ui.renderMovieGrid(movies.slice(0, 40), grid, (movie) => this.showMoviePairing(movie.id));
             } else {
                 grid.innerHTML = '<div class="empty-state"><h2>No movies found</h2></div>';
             }
@@ -92,7 +212,10 @@ class FlickBite {
     }
 
     async filterByGenre(genreId, genreName) {
-        const grid = document.getElementById('movieGrid');
+        // Use first available grid
+        const grid = document.getElementById('movieGrid') || document.getElementById('trendingGrid');
+        if (!grid) return;
+        
         grid.innerHTML = `<div class="loading">Loading ${genreName} movies...</div>`;
 
         try {
@@ -112,7 +235,10 @@ class FlickBite {
         const searchTerm = document.getElementById('searchInput').value.trim();
         if (!searchTerm) return;
 
-        const grid = document.getElementById('movieGrid');
+        // Use first available grid
+        const grid = document.getElementById('movieGrid') || document.getElementById('trendingGrid');
+        if (!grid) return;
+        
         grid.innerHTML = '<div class="loading">Searching movies...</div>';
 
         try {
@@ -151,9 +277,11 @@ class FlickBite {
         this.showView('pairing');
 
         try {
-            // Get movie details
+            // Get movie details and cast
             const movie = await this.tmdbAPI.getMovieDetails(movieId);
+            const cast = await this.tmdbAPI.getMovieCredits(movieId);
             this.currentMovie = movie;
+            this.currentMovie.cast = cast;
 
             // Match cuisine to movie
             const cuisine = this.matchCuisineToMovie(movie);
@@ -183,8 +311,55 @@ class FlickBite {
         }
     }
 
+    // Show actor details popup
+    async showActorDetails(actorId) {
+        try {
+            const actor = await this.tmdbAPI.getActorDetails(actorId);
+            if (!actor) return;
+
+            const photoUrl = actor.profile_path 
+                ? `https://image.tmdb.org/t/p/w300${actor.profile_path}`
+                : 'https://via.placeholder.com/300x450?text=No+Photo';
+
+            const birthday = actor.birthday ? new Date(actor.birthday).toLocaleDateString() : 'Unknown';
+            const birthplace = actor.place_of_birth || 'Unknown';
+            const bio = actor.biography || 'No biography available.';
+
+            // Create modal
+            const modal = document.createElement('div');
+            modal.className = 'actor-modal';
+            modal.innerHTML = `
+                <div class="actor-modal-content">
+                    <button class="actor-modal-close" onclick="this.closest('.actor-modal').remove()">✕</button>
+                    <div class="actor-modal-body">
+                        <img src="${photoUrl}" alt="${actor.name}" class="actor-photo">
+                        <div class="actor-info">
+                            <h2>${actor.name}</h2>
+                            <p><strong>Birthday:</strong> ${birthday}</p>
+                            <p><strong>Birthplace:</strong> ${birthplace}</p>
+                            <p><strong>Known for:</strong> ${actor.known_for_department || 'Acting'}</p>
+                            <div class="actor-bio">
+                                <h3>Biography</h3>
+                                <p>${bio.substring(0, 500)}${bio.length > 500 ? '...' : ''}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            // Close on background click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.remove();
+            });
+
+        } catch (error) {
+            console.error('Error showing actor details:', error);
+        }
+    }
+
     matchCuisineToMovie(movie) {
-        // Cuisine mapping based on movie origin
         const cuisineMap = {
             'US': 'American',
             'GB': 'British',
@@ -212,7 +387,6 @@ class FlickBite {
             'UA': 'Ukrainian'
         };
 
-        // First, check production countries (most accurate)
         if (movie.production_countries && movie.production_countries.length > 0) {
             const country = movie.production_countries[0].iso_3166_1;
             if (cuisineMap[country]) {
@@ -221,7 +395,6 @@ class FlickBite {
             }
         }
 
-        // Fallback: Match by genre with more variety
         const genres = movie.genres?.map(g => g.name) || [];
         
         if (genres.includes('Action')) return 'American';
@@ -241,7 +414,6 @@ class FlickBite {
         if (genres.includes('Musical')) return 'American';
         if (genres.includes('Family')) return 'Italian';
         
-        // Final fallback
         console.log(`No specific match for ${movie.title}, defaulting to Italian`);
         return 'Italian';
     }

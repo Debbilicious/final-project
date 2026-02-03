@@ -1,6 +1,6 @@
 export class TMDBAPI {
     constructor() {
-        this.apiKey = 'ec9c1b48e2d39fa4c46753d1eb648245';
+        this.apiKey = 'ec9c1b48e2d39fa4c46753d1eb648245'; 
         this.baseURL = 'https://api.themoviedb.org/3';
     }
 
@@ -37,6 +37,28 @@ export class TMDBAPI {
         }
     }
 
+    async getMovieCredits(movieId) {
+        try {
+            const response = await fetch(`${this.baseURL}/movie/${movieId}/credits?api_key=${this.apiKey}`);
+            const data = await response.json();
+            return data.cast || [];
+        } catch (error) {
+            console.error('Error getting movie credits:', error);
+            return [];
+        }
+    }
+
+    async getActorDetails(actorId) {
+        try {
+            const response = await fetch(`${this.baseURL}/person/${actorId}?api_key=${this.apiKey}`);
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error getting actor details:', error);
+            return null;
+        }
+    }
+
     async getMoviesByGenre(genreId) {
         try {
             const response = await fetch(`${this.baseURL}/discover/movie?api_key=${this.apiKey}&with_genres=${genreId}`);
@@ -55,6 +77,17 @@ export class TMDBAPI {
             return data.results;
         } catch (error) {
             console.error('Error getting popular movies:', error);
+            throw error;
+        }
+    }
+
+    async getTopRatedMovies() {
+        try {
+            const response = await fetch(`${this.baseURL}/movie/top_rated?api_key=${this.apiKey}`);
+            const data = await response.json();
+            return data.results;
+        } catch (error) {
+            console.error('Error getting top rated movies:', error);
             throw error;
         }
     }

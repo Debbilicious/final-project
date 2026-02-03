@@ -51,6 +51,18 @@ export class UIManager {
                             <p><strong>Runtime:</strong> ${movie.runtime ? movie.runtime + ' min' : 'N/A'}</p>
                             <div class="genre-tags">${genreTags}</div>
                             <p class="overview">${movie.overview || 'No description available.'}</p>
+                            
+                            ${movie.cast && movie.cast.length > 0 ? `
+                                <h3 style="margin-top: 1.5rem; color: #6C63FF; font-size: 1.1rem;">Cast</h3>
+                                <div class="cast-list">
+                                    ${movie.cast.slice(0, 5).map(actor => `
+                                        <div class="cast-member">
+                                            <strong class="actor-name" onclick="window.app.showActorDetails(${actor.id})">${actor.name}</strong> 
+                                            <span class="character">as ${actor.character || 'Unknown Role'}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
                         </div>
                     </div>
 
